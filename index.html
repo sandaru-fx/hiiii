@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenTask - Ultimate Productivity</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#6366f1', // Indigo primary
+                            600: '#4f46e5',
+                            glow: '#818cf8',
+                        },
+                        dark: {
+                            bg: '#0f172a', // Slate 900
+                            card: 'rgba(30, 41, 59, 0.7)', 
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
+        
+        /* 3D Canvas Styles (Background) */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; 
+            background: #000000; /* Fallback */
+            background: radial-gradient(circle at center, #1e1b4b 0%, #000000 100%);
+        }
+
+        /* Glass Effect Class */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="text-white h-screen overflow-hidden antialiased selection:bg-brand-500 selection:text-white">
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="app" class="relative z-10 h-full flex flex-col items-center justify-center p-4">
+        
+        <div id="login-view" class="w-full max-w-md animate-float">
+            <div class="glass-panel p-8 rounded-2xl text-center relative overflow-hidden">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-brand-500 shadow-[0_0_30px_rgba(99,102,241,0.8)]"></div>
+
+                <div class="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20 shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+                    <i class="ri-rocket-2-fill text-4xl"></i>
+                </div>
+
+                <h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-indigo-200 to-indigo-400 text-transparent bg-clip-text">
+                    ZenTask
+                </h1>
+                <p class="text-gray-400 mb-8 text-sm uppercase tracking-widest">Productivity Evolved</p>
+
+                <form id="login-form" class="space-y-4 text-left">
+                    <div class="group">
+                        <label class="block text-xs text-brand-glow mb-1 ml-1">EMAIL ADDRESS</label>
+                        <input type="email" value="dev@machan.com" class="w-full bg-dark-bg/40 border border-gray-700/50 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-500 focus:bg-dark-bg/60 transition-all text-white placeholder-gray-600">
+                    </div>
+                    <div class="group">
+                        <label class="block text-xs text-brand-glow mb-1 ml-1">PASSWORD</label>
+                        <input type="password" value="password" class="w-full bg-dark-bg/40 border border-gray-700/50 rounded-lg px-4 py-3 focus:outline-none focus:border-brand-500 focus:bg-dark-bg/60 transition-all text-white placeholder-gray-600">
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3.5 rounded-lg shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mt-2">
+                        <span>Enter Workspace</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-white/5 text-sm text-gray-500">
+                    Or continue with <span class="text-brand-400 cursor-pointer hover:text-brand-300 transition-colors">Google Account</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard-view" class="hidden w-full h-full max-w-7xl glass-panel rounded-2xl overflow-hidden flex flex-col md:flex-row opacity-0 transform translate-y-4">
+            <aside class="w-full md:w-64 bg-dark-bg/40 border-r border-white/5 flex flex-col p-4 backdrop-blur-md">
+                <div class="flex items-center gap-3 mb-8 px-2 py-2">
+                    <div class="w-8 h-8 rounded bg-brand-500 flex items-center justify-center shadow-lg shadow-brand-500/30">
+                        <i class="ri-rocket-2-fill text-white"></i>
+                    </div>
+                    <span class="font-bold text-lg tracking-wide text-white">ZenTask</span>
+                </div>
+                
+                <nav class="flex-1 space-y-2">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-brand-500/20 text-brand-glow rounded-xl border border-brand-500/20 shadow-sm">
+                        <i class="ri-dashboard-3-line"></i> <span class="font-medium">Dashboard</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                        <i class="ri-checkbox-circle-line"></i> <span>My Tasks</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                        <i class="ri-calendar-event-line"></i> <span>Calendar</span>
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                        <i class="ri-bar-chart-grouped-line"></i> <span>Analytics</span>
+                    </a>
+                </nav>
+
+                <div class="pt-4 border-t border-white/5">
+                    <div class="flex items-center gap-3 px-2 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors">
+                        <img src="https://ui-avatars.com/api/?name=Dev+Machan&background=6366f1&color=fff" class="w-9 h-9 rounded-full ring-2 ring-brand-500/50">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium truncate">Dev Machan</p>
+                            <p class="text-xs text-brand-400 truncate">Pro Plan</p>
+                        </div>
+                        <button id="logout-btn" class="text-gray-500 hover:text-white transition-colors"><i class="ri-logout-box-r-line"></i></button>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="flex-1 p-6 md:p-8 overflow-y-auto relative scroll-smooth">
+                <header class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white mb-1">Welcome Back! 👋</h2>
+                        <p class="text-gray-400">Here's your productivity overview for today.</p>
+                    </div>
+                    <button class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2.5 rounded-lg shadow-lg shadow-brand-500/20 flex items-center gap-2 transition-transform active:scale-95">
+                        <i class="ri-add-line text-xl"></i> <span>New Task</span>
+                    </button>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:bg-white/5 transition-colors">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="ri-list-check text-6xl"></i>
+                        </div>
+                        <p class="text-gray-400 text-sm font-medium mb-1">TASKS TO DO</p>
+                        <p class="text-4xl font-bold text-white">12</p>
+                        <div class="mt-4 text-xs text-orange-400 flex items-center gap-1">
+                            <i class="ri-time-line"></i> <span>3 Overdue</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:bg-white/5 transition-colors">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="ri-check-double-line text-6xl"></i>
+                        </div>
+                        <p class="text-gray-400 text-sm font-medium mb-1">COMPLETED</p>
+                        <p class="text-4xl font-bold text-white">5</p>
+                        <div class="mt-4 text-xs text-green-400 flex items-center gap-1">
+                            <i class="ri-arrow-up-line"></i> <span>+2 from yesterday</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:bg-white/5 transition-colors">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="ri-focus-2-line text-6xl"></i>
+                        </div>
+                        <p class="text-gray-400 text-sm font-medium mb-1">FOCUS SCORE</p>
+                        <p class="text-4xl font-bold text-brand-glow">85%</p>
+                        <div class="w-full bg-gray-700 h-1.5 rounded-full mt-4 overflow-hidden">
+                            <div class="bg-brand-500 h-full rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <i class="ri-fire-line text-orange-500"></i> Today's Priorities
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-brand-500/30 transition-all cursor-pointer group">
+                            <div class="flex items-center gap-4">
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-500 hover:border-brand-500 cursor-pointer"></div>
+                                <div>
+                                    <p class="font-medium text-white group-hover:text-brand-200">Complete UI Design for Project X</p>
+                                    <p class="text-xs text-gray-500">Tag: <span class="text-blue-400">#Work</span> • Due: 6:00 PM</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-semibold bg-red-500/10 text-red-400 rounded-full border border-red-500/20">High</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-brand-500/30 transition-all cursor-pointer group">
+                            <div class="flex items-center gap-4">
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-500 hover:border-brand-500 cursor-pointer"></div>
+                                <div>
+                                    <p class="font-medium text-white group-hover:text-brand-200">Review PRs on GitHub</p>
+                                    <p class="text-xs text-gray-500">Tag: <span class="text-purple-400">#Dev</span> • Due: 8:00 PM</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-semibold bg-yellow-500/10 text-yellow-400 rounded-full border border-yellow-500/20">Medium</span>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // === PART A: THREE.JS BACKGROUND LOGIC ===
+        const initThreeJS = () => {
+            const canvas = document.querySelector('#bg-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            // Renderer Setup
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                alpha: true,
+                antialias: true
+            });
+
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.position.setZ(30);
+
+            // Particles
+            const geometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 80; // Spread
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            // Material
+            const material = new THREE.PointsMaterial({
+                size: 0.12,
+                color: 0x6366f1, // Indigo
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(geometry, material);
+            scene.add(particlesMesh);
+
+            // Mouse Interaction
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
+            // Clock for smooth animation
+            const clock = new THREE.Clock();
+
+            const animate = () => {
+                const elapsedTime = clock.getElapsedTime();
+
+                targetX = mouseX * 0.001;
+                targetY = mouseY * 0.001;
+
+                // Smooth rotation
+                particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
+                particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
+
+                // Constant gentle float
+                particlesMesh.rotation.z += 0.0005; 
+                particlesMesh.position.y = Math.sin(elapsedTime * 0.2) * 2;
+
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+
+            animate();
+
+            // Resize Handle
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // === PART B: UI/APP LOGIC ===
+        const initApp = () => {
+            const loginForm = document.getElementById('login-form');
+            const loginView = document.getElementById('login-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // Login Action
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // 1. Hide Login
+                loginView.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                loginView.style.opacity = '0';
+                loginView.style.transform = 'translateY(-20px) scale(0.95)';
+
+                setTimeout(() => {
+                    loginView.classList.add('hidden');
+                    
+                    // 2. Show Dashboard
+                    dashboardView.classList.remove('hidden');
+                    
+                    // Trigger reflow
+                    void dashboardView.offsetWidth;
+
+                    // Animate In
+                    dashboardView.classList.remove('opacity-0', 'translate-y-4');
+                    dashboardView.classList.add('animate-fade-in');
+
+                }, 500);
+            });
+
+            // Logout Action (Reloads page for now)
+            logoutBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        };
+
+        // Initialize Everything
+        document.addEventListener('DOMContentLoaded', () => {
+            initThreeJS();
+            initApp();
+        });
+
+    </script>
+</body>
+</html>
